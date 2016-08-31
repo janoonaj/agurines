@@ -1,0 +1,6 @@
+bin/
+temp/
+Library/
+Agurines.CSharp.csproj
+Agurines.CSharp.Editor.csproj
+Agurines.sln
