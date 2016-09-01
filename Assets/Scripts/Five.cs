@@ -1,12 +1,19 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class Five : MonoBehaviour {
     private const float MAX_X_SPEED = 4f;
+    public Vector3 currentPos;
+    public Vector3 lastPos;
 
-    // Use this for initialization
+    void Start() {
+        currentPos = lastPos = transform.position;
+    }
+
     void FixedUpdate() {
         limitXSpeed();
+        lastPos = currentPos;
+        currentPos = transform.position;
     }
 
     private void limitXSpeed() {
