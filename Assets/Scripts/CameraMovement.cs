@@ -7,7 +7,7 @@ public class CameraMovement : MonoBehaviour {
     private const float smoothTimeY = 0.05f;
     private Vector2 velocity;
     private float[] MARGIN_X = { 0.65f, 0.35f };
-    private float[] MARGIN_Y = { 0.8f, 0.2f };
+    private float[] MARGIN_Y = { 0.65f, 0.35f };
 
     public void Start() {
         player = GameObject.Find("five");
