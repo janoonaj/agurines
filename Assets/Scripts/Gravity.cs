@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 
@@ -7,7 +7,19 @@ public class Gravity : MonoBehaviour {
     private const float MAX_X_GRAVITY = 6f;
 
     void FixedUpdate() {
-        float gravForce = Input.acceleration.x;
+
+        float gravForce = 0f;
+
+        if (Application.platform == RuntimePlatform.WindowsEditor) {
+            float PC_GRAVITY = 0.4f;
+            if (Input.GetKey(KeyCode.LeftArrow)) gravForce = -PC_GRAVITY;
+            if (Input.GetKey(KeyCode.RightArrow)) gravForce = PC_GRAVITY;
+        }
+
+        if(Application.platform == RuntimePlatform.Android) {
+            gravForce = Input.acceleration.x;
+        }
+        
         bool rotateLeft = false;
         if (gravForce < 0)
         {
