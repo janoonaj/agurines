@@ -5,9 +5,9 @@ public class CameraMovement : MonoBehaviour {
     private GameObject player;
     private const float smoothTimeX = 0.05f;
     private const float smoothTimeY = 0.05f;
-    private Vector2 velocity;
     private float[] MARGIN_X = { 0.65f, 0.35f };
     private float[] MARGIN_Y = { 0.65f, 0.35f };
+    private bool cameraMovementEnable = true;
 
     public void Start() {
         player = GameObject.Find("five");
@@ -15,6 +15,8 @@ public class CameraMovement : MonoBehaviour {
 
     //TODO: soft the camera movement a little bit with smoothdamp
     void FixedUpdate () {
+        if (cameraMovementEnable == false) return;
+
         Vector3 viewPosition = GetComponent<Camera>().WorldToViewportPoint(player.transform.position);
 
         Vector3 playerMove = player.GetComponent<Five>().currentPos - player.GetComponent<Five>().lastPos;
@@ -49,5 +51,12 @@ public class CameraMovement : MonoBehaviour {
 
     private bool movingDown(Vector3 playerMove) {
         return playerMove.y < 0;
+    }
+
+    public IEnumerator centerOn(Vector3 pos) {
+        cameraMovementEnable = false;
+        transform.position = pos;
+        yield return new WaitForSeconds(2);
+        cameraMovementEnable = true;
     }
 }

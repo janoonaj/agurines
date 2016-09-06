@@ -3,11 +3,12 @@ using System.Collections;
 
 public class Five : MonoBehaviour {
     private const float MAX_X_SPEED = 5f;
-    public Vector3 currentPos;
-    public Vector3 lastPos;
+    [HideInInspector] public Vector3 respawnPos;
+    [HideInInspector] public Vector3 currentPos;
+    [HideInInspector] public Vector3 lastPos;
 
     void Start() {
-        currentPos = lastPos = transform.position;
+        currentPos = lastPos = respawnPos = transform.position;
     }
 
     void FixedUpdate() {
@@ -24,5 +25,27 @@ public class Five : MonoBehaviour {
         xSpeed *= symbol;
 
         GetComponent<Rigidbody2D>().velocity = new Vector2(xSpeed, GetComponent<Rigidbody2D>().velocity.y);
+    }
+
+    void OnTriggerEnter2D(Collider2D col) {
+        if (col.gameObject.tag == "OutOfScreenTrigger") {
+            transform.position = respawnPos;
+            stopSpeed();
+            centerCamera();
+        }
+        else if (col.gameObject.tag == "Respawn") {
+            const float RESPAWN_MARGIN_Y_AXIS = 0.5f;
+            Vector3 flagPos = col.transform.position;
+            respawnPos = new Vector3(flagPos.x, flagPos.y + RESPAWN_MARGIN_Y_AXIS, 0f);
+            Destroy(col.gameObject);
+        }
+    }
+
+    private void stopSpeed() {
+        GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
+    }
+
+    private void centerCamera() {
+        GameObject.Find("Main Camera").GetComponent<CameraMovement>().centerOn(respawnPos);
     }
 }
