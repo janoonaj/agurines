@@ -14,6 +14,13 @@ public class Gravity : MonoBehaviour {
             float PC_GRAVITY = 0.4f;
             if (Input.GetKey(KeyCode.LeftArrow)) gravForce = -PC_GRAVITY;
             if (Input.GetKey(KeyCode.RightArrow)) gravForce = PC_GRAVITY;
+
+            if (Input.GetKey(KeyCode.UpArrow)) {
+                GameObject five = GameObject.Find("five");
+                if (five != null) {
+                    five.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 5f), ForceMode2D.Impulse);
+                }
+            }
         }
 
         if(Application.platform == RuntimePlatform.Android) {
