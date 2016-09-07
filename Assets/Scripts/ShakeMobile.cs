@@ -58,7 +58,7 @@ public class ShakeMobile : MonoBehaviour {
 
         GameObject five = GameObject.Find("five");
         if(five != null) {
-            five.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 4), ForceMode2D.Impulse);
+            five.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, SHAKE_FORCE), ForceMode2D.Impulse);
         }
     }
 
