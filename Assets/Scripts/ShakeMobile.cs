@@ -62,4 +62,8 @@ public class ShakeMobile : MonoBehaviour {
         }
     }
 
+    public void printME() {
+        print("TOCADO");
+    }
+
 }
