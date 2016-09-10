@@ -31,7 +31,7 @@ public class Five : MonoBehaviour {
         if (col.gameObject.tag == "OutOfScreenTrigger") {
             transform.position = respawnPos;
             stopSpeed();
-            centerCamera();
+            callCameraToCenter();
         }
         else if (col.gameObject.tag == "Respawn") {
             const float RESPAWN_MARGIN_Y_AXIS = 0.5f;
@@ -39,13 +39,16 @@ public class Five : MonoBehaviour {
             respawnPos = new Vector3(flagPos.x, flagPos.y + RESPAWN_MARGIN_Y_AXIS, 0f);
             Destroy(col.gameObject);
         }
+        else if (col.gameObject.tag == "LevelFinishedTrigger") {
+            GameObject.Find("Engine").GetComponent<SceneController>().gotoNextLevel();
+        }
     }
 
     private void stopSpeed() {
         GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
     }
 
-    private void centerCamera() {
+    private void callCameraToCenter() {
         GameObject.Find("Main Camera").GetComponent<CameraMovement>().centerOn(respawnPos);
     }
 }
