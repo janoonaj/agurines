@@ -7,6 +7,10 @@ public class Five : MonoBehaviour {
     [HideInInspector] public Vector3 currentPos;
     [HideInInspector] public Vector3 lastPos;
 
+    void Awake() {
+        GetComponent<Renderer>().material.color = new Color(1, 1, 0.17f);
+    }
+
     void Start() {
         currentPos = lastPos = respawnPos = transform.position;
     }
@@ -41,6 +45,10 @@ public class Five : MonoBehaviour {
         }
         else if (col.gameObject.tag == "LevelFinishedTrigger") {
             GameObject.Find("Engine").GetComponent<SceneController>().gotoNextLevel();
+        }
+        else if(col.gameObject.tag == "Collectible") {
+            GameObject.Find("Engine").GetComponent<CollectiblePoints>().recollectPoint();
+            Destroy(col.gameObject);
         }
     }
 
