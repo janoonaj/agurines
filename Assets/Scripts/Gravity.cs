@@ -36,7 +36,7 @@ public class Gravity : MonoBehaviour {
 
         Vector2 gravity = calculateGravity(gravForce, rotateLeft);
         gravity.x = limitXGravity(gravity.x, rotateLeft);
-        gravity.y = removePositiveYGravity(gravity.y);
+        gravity.y = limitYGravity(gravity.y);
 
         Physics2D.gravity = new Vector3(gravity.x, gravity.y, 0f);
     }
@@ -58,7 +58,7 @@ public class Gravity : MonoBehaviour {
         return Mathf.Min(MAX_X_GRAVITY, accelX);
     }
 
-    private float removePositiveYGravity(float accelY) {
-        return Mathf.Min(0, accelY);
+    private float limitYGravity(float accelY) {
+        return Mathf.Min(-1, accelY);
     }
 }
