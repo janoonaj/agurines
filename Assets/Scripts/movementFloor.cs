@@ -15,7 +15,7 @@ public class MovementFloor : MonoBehaviour {
 
     void Start() {
         startPos = transform.position;
-        direction = finalPos - startPos;
+        direction = Vector3.Normalize(finalPos - startPos);
         effector = GetComponentInChildren<AreaEffector2D>();
     }
 	
@@ -58,7 +58,7 @@ public class MovementFloor : MonoBehaviour {
         Vector3 temp = startPos;
         startPos = finalPos;
         finalPos = temp;
-        direction = finalPos - startPos;
+        direction = Vector3.Normalize(finalPos - startPos);
     }
 
     private void updateWaitingTime() {
@@ -77,7 +77,7 @@ public class MovementFloor : MonoBehaviour {
      * to make it easier.
      */
     private void startForce() {
-        const float FAKE_FORCE = 1f;
+        float FAKE_FORCE = speed * 3.333f;
         effector.forceAngle = Vector3.Angle(Vector3.right, direction);
         effector.forceMagnitude = FAKE_FORCE;
     }
