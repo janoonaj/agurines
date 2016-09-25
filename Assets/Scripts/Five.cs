@@ -36,12 +36,13 @@ public class Five : MonoBehaviour {
             transform.position = respawnPos;
             stopSpeed();
             callCameraToCenter();
+            GameObject.Find("Engine").GetComponent<ResetScene>().reset();
         }
         else if (col.gameObject.tag == "Respawn") {
             const float RESPAWN_MARGIN_Y_AXIS = 0.5f;
             Vector3 flagPos = col.transform.position;
             respawnPos = new Vector3(flagPos.x, flagPos.y + RESPAWN_MARGIN_Y_AXIS, 0f);
-            Destroy(col.gameObject);
+            Destroy(col.gameObject);            
         }
         else if (col.gameObject.tag == "LevelFinishedTrigger") {
             GameObject.Find("Engine").GetComponent<SceneController>().gotoNextLevel();

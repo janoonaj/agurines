@@ -17,9 +17,6 @@ public class CollectiblePoints : MonoBehaviour {
 	
 	public void recollectPoint() {
         recollected++;
-        print("one more");
-        if (recollectedAll())
-            print("todos!");
     }
 
     public bool recollectedAll() {
