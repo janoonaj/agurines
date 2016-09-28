@@ -13,14 +13,20 @@ using System;
 public class ImpulseFloor : MovementFloor {
     public bool comesBack = true;
     private BoxCollider2D colliderTrigger;
-    
+    public Vector3 initialPos;
+    public Quaternion initialRotation;
+
     void Start() {
         base.init();
         waitingTime = 0f;
-        if (comesBack) maxMovements = 2;
-        else maxMovements = 1;
         colliderTrigger = GetComponent<BoxCollider2D>();
+        saveInitialTransformation();
         stop();
+    }
+
+    private int calculateNumMaxMovements() {
+        if (comesBack) return 2;
+        else return 1;
     }
 
     override protected void onMovementFinished() {
@@ -35,12 +41,27 @@ public class ImpulseFloor : MovementFloor {
     }
 
     private void move() {
-        enableMovement = true;
+        activate(calculateNumMaxMovements());
         colliderTrigger.enabled = false;
     }
 
     private void stop() {
         enableMovement = false;
         colliderTrigger.enabled = true;
+    }
+
+    private void saveInitialTransformation() {
+        initialPos = transform.position;
+        initialRotation = transform.rotation;
+    }
+
+    public void reset() {
+        //If comesback does not need reset, 
+        //it already came back to original position.
+        if(comesBack == false) {
+            transform.position = initialPos;
+            transform.rotation = initialRotation;
+            deactivate();
+        }
     }
 }

@@ -64,7 +64,8 @@ public class MovementFloor : MonoBehaviour {
         enableMovement = true;
         maxMovements = numMovements;
     }
-    private void deactivate() {
+
+    protected void deactivate() {
         enableMovement = false;
         maxMovements = 0;
         movementsCount = 0;
