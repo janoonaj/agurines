@@ -50,6 +50,8 @@ public class MovementFloor : MonoBehaviour {
             switchDirection();
             stopForce();
             movementsCount++;
+            if (movementsCount == 1)
+                onFirstMovement();
             if(maxMovements > 0 && movementsCount >= maxMovements) {
                 onMovementFinished();
             }       
@@ -122,6 +124,8 @@ public class MovementFloor : MonoBehaviour {
     protected virtual void onMovementFinished() {
         deactivate();
     }
+
+    protected virtual void onFirstMovement() { }
 
     /*
      * Control the ball on a platform, when its moving, is very difficult for the player.

@@ -12,15 +12,20 @@ using System;
 
 public class ImpulseFloor : MovementFloor {
     public bool comesBack = true;
+    public float impulseSpeed;
+    private Vector2 impulseSpeedVector;
     private BoxCollider2D colliderTrigger;
-    public Vector3 initialPos;
-    public Quaternion initialRotation;
+    private Vector3 initialPos;
+    private Quaternion initialRotation;
+    private GameObject player;
 
     void Start() {
         base.init();
         waitingTime = 0f;
         colliderTrigger = GetComponent<BoxCollider2D>();
+        player = GameObject.Find("five");
         saveInitialTransformation();
+        impulseSpeedVector = calculateImpulseForceVector();       
         stop();
     }
 
@@ -34,9 +39,23 @@ public class ImpulseFloor : MovementFloor {
         stop();
     }
 
+    override protected void onFirstMovement() {
+        /*if (impulseForce > 0)
+            player.GetComponent<Rigidbody2D>().AddForce(impulseForceVector, ForceMode2D.Impulse);*/
+    }
+
     void OnTriggerEnter2D(Collider2D col) {
         if(col.name == "five") {
-            move();    
+            move();
+            if (impulseSpeed > 0) {
+                player.GetComponent<Five>().applySpeed(impulseSpeedVector);
+                /*Vector2 currentVelocity = 
+                player.GetComponent<Rigidbody2D>().velocity.x += impulseForceVector.x;
+                player.GetComponent<Rigidbody2D>().velocity.y += impulseForceVector.y;*/
+
+            }
+                //player.GetComponent<Rigidbody2D>()
+                //player.GetComponent<Rigidbody2D>().AddForce(impulseForceVector, ForceMode2D.Impulse);
         }
     }
 
@@ -63,5 +82,21 @@ public class ImpulseFloor : MovementFloor {
             transform.rotation = initialRotation;
             deactivate();
         }
+    }
+
+    private Vector2 calculateImpulseForceVector() {
+        if (direction.x > 0) {
+            return new Vector2(impulseSpeed, 0);
+        }
+        else if (direction.x < 0) {
+            return new Vector2(-impulseSpeed, 0);
+        }
+        else if (direction.y < 0) {
+            return new Vector2(0, -impulseSpeed);
+        }
+        else if (direction.y > 0) {
+            return new Vector2(0, impulseSpeed);
+        }
+        throw (new ArgumentNullException());
     }
 }

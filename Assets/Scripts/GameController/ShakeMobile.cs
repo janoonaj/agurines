@@ -57,9 +57,4 @@ public class ShakeMobile : MonoBehaviour {
         currentCoolDownTime = 0f;
         GameObject.Find("five").GetComponent<Rigidbody2D>().AddForce(new Vector2(0, SHAKE_FORCE), ForceMode2D.Impulse);
     }
-
-    public void printME() {
-        print("TOCADO");
-    }
-
 }

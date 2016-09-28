@@ -60,4 +60,12 @@ public class Five : MonoBehaviour {
     private void callCameraToCenter() {
         GameObject.Find("Main Camera").GetComponent<CameraMovement>().centerOn(respawnPos);
     }
+
+    public void applySpeed(Vector2 speed) {
+        Vector2 tempSpeed = GetComponent<Rigidbody2D>().velocity;
+        if (speed.x != 0) tempSpeed.x = speed.x;
+        if (speed.y != 0) tempSpeed.y = speed.y;
+        tempSpeed += speed;
+        GetComponent<Rigidbody2D>().velocity = tempSpeed;
+    }
 }
