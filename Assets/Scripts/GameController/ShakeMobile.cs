@@ -55,11 +55,7 @@ public class ShakeMobile : MonoBehaviour {
     private void shake() {
         coolingDown = true;
         currentCoolDownTime = 0f;
-
-        GameObject five = GameObject.Find("five");
-        if(five != null) {
-            five.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, SHAKE_FORCE), ForceMode2D.Impulse);
-        }
+        GameObject.Find("five").GetComponent<Rigidbody2D>().AddForce(new Vector2(0, SHAKE_FORCE), ForceMode2D.Impulse);
     }
 
     public void printME() {

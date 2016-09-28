@@ -2,21 +2,21 @@ using UnityEngine;
 using System.Collections;
 
 public class Background : MonoBehaviour {
-    private Camera camera;
+    private Camera maincamera;
     private Vector3 initialCameraPos;
     private Vector3 lastCameraPos;
     private float CAMERA_WIDTH;
     private float CAMERA_HEIGHT;
 
     void Start() {
-        camera = Camera.main;
-        lastCameraPos = initialCameraPos = camera.transform.position;
-        CAMERA_HEIGHT = 2f * camera.orthographicSize;
-        CAMERA_WIDTH = CAMERA_HEIGHT * camera.aspect;
+        maincamera = Camera.main;
+        lastCameraPos = initialCameraPos = maincamera.transform.position;
+        CAMERA_HEIGHT = 2f * maincamera.orthographicSize;
+        CAMERA_WIDTH = CAMERA_HEIGHT * maincamera.aspect;
     }
 
     void FixedUpdate() {
-        Vector3 cameraPos = camera.transform.position;
+        Vector3 cameraPos = maincamera.transform.position;
         if(lastCameraPos != cameraPos) {
             Vector3 offset = (lastCameraPos - initialCameraPos);
             offset = adaptOffsetToCamera(offset);
