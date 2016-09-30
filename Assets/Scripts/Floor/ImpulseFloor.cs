@@ -11,7 +11,6 @@ using System;
  */
 
 public class ImpulseFloor : MovementFloor {
-    public bool comesBack = true;
     public float impulseSpeed;
     private Vector2 impulseSpeedVector;
     private BoxCollider2D colliderTrigger;
@@ -29,11 +28,6 @@ public class ImpulseFloor : MovementFloor {
         stop();
     }
 
-    private int calculateNumMaxMovements() {
-        if (comesBack) return 2;
-        else return 1;
-    }
-
     override protected void onMovementFinished() {
         base.onMovementFinished();
         stop();
@@ -49,18 +43,13 @@ public class ImpulseFloor : MovementFloor {
             move();
             if (impulseSpeed > 0) {
                 player.GetComponent<Five>().applySpeed(impulseSpeedVector);
-                /*Vector2 currentVelocity = 
-                player.GetComponent<Rigidbody2D>().velocity.x += impulseForceVector.x;
-                player.GetComponent<Rigidbody2D>().velocity.y += impulseForceVector.y;*/
 
             }
-                //player.GetComponent<Rigidbody2D>()
-                //player.GetComponent<Rigidbody2D>().AddForce(impulseForceVector, ForceMode2D.Impulse);
         }
     }
 
     private void move() {
-        activate(calculateNumMaxMovements());
+        activate();
         colliderTrigger.enabled = false;
     }
 
@@ -75,13 +64,9 @@ public class ImpulseFloor : MovementFloor {
     }
 
     public void reset() {
-        //If comesback does not need reset, 
-        //it already came back to original position.
-        if(comesBack == false) {
-            transform.position = initialPos;
-            transform.rotation = initialRotation;
-            deactivate();
-        }
+        transform.position = initialPos;
+        transform.rotation = initialRotation;
+        deactivate();
     }
 
     private Vector2 calculateImpulseForceVector() {

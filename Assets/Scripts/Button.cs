@@ -5,7 +5,7 @@ using System;
 public class Button : MonoBehaviour {
     private const float speed = 3f;
     public int angleDirection;
-    public GameObject platform;
+    public GameObject[] platforms;
     private Vector3 finalPos;
     private Vector3 direction;
     private Vector3 startPos;
@@ -53,9 +53,10 @@ public class Button : MonoBehaviour {
     }
 
     void OnTriggerEnter2D(Collider2D other) {
-        if(other.name == "five" && isMoving == false && isSleeping == false) {
+        if(other.tag == "Player" && isMoving == false && isSleeping == false) {
             isMoving = true;
-            platform.GetComponent<MovementFloor>().activate(2);
+            foreach(GameObject activable in platforms)
+                activable.GetComponent<IActivable>().activate();
         }
     }
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class MovementFloor : MonoBehaviour {
+public class MovementFloor : MonoBehaviour, IActivable {
 
     /*
      * TODO: needs massive refactor.
@@ -13,13 +13,13 @@ public class MovementFloor : MonoBehaviour {
     public Vector3 finalPos;
     public float waitingTime;
     public bool enableMovement = true;
+    public int maxMovements; //Movements the platform will do, 0 means infinite movement
     protected Clock clock;
     protected Vector3 direction;
     protected Vector3 startPos;
     protected bool waiting = false;
     protected float waitingTimeCount = 0;
     protected AreaEffector2D effector;
-    protected int maxMovements = 0;
     protected int movementsCount = 0;
 
 
@@ -62,14 +62,12 @@ public class MovementFloor : MonoBehaviour {
         }
     }
 
-    public void activate(int numMovements) {
+    public void activate() {
         enableMovement = true;
-        maxMovements = numMovements;
     }
 
     protected void deactivate() {
         enableMovement = false;
-        maxMovements = 0;
         movementsCount = 0;
     }
 
