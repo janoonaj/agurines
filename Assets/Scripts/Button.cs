@@ -6,6 +6,7 @@ public class Button : MonoBehaviour {
     private const float speed = 3f;
     public int angleDirection;
     public GameObject[] platforms;
+    public GameObject sceneController;
     private Vector3 finalPos;
     private Vector3 direction;
     private Vector3 startPos;
@@ -57,6 +58,8 @@ public class Button : MonoBehaviour {
             isMoving = true;
             foreach(GameObject activable in platforms)
                 activable.GetComponent<IActivable>().activate();
+            if (sceneController != null)
+                sceneController.GetComponent<SceneController>().buttonPush(this.gameObject);
         }
     }
 

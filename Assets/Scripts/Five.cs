@@ -45,7 +45,7 @@ public class Five : MonoBehaviour {
             Destroy(col.gameObject);            
         }
         else if (col.gameObject.tag == "LevelFinishedTrigger") {
-            GameObject.Find("Engine").GetComponent<SceneController>().gotoNextLevel();
+            GameObject.Find("Engine").GetComponent<SceneNavigation>().gotoNextLevel();
         }
         else if(col.gameObject.tag == "Collectible") {
             GameObject.Find("Engine").GetComponent<CollectiblePoints>().recollectPoint();
@@ -67,5 +67,13 @@ public class Five : MonoBehaviour {
         if (speed.y != 0) tempSpeed.y = speed.y;
         tempSpeed += speed;
         GetComponent<Rigidbody2D>().velocity = tempSpeed;
+    }
+
+    public void freeze() {
+        GetComponent<Rigidbody2D>().isKinematic = true;
+    }
+
+    public void unfreeze() {
+        GetComponent<Rigidbody2D>().isKinematic = false;
     }
 }
