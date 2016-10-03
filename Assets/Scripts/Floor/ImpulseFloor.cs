@@ -14,8 +14,6 @@ public class ImpulseFloor : MovementFloor {
     public float impulseSpeed;
     private Vector2 impulseSpeedVector;
     private BoxCollider2D colliderTrigger;
-    private Vector3 initialPos;
-    private Quaternion initialRotation;
     private GameObject player;
 
     void Start() {
@@ -23,7 +21,6 @@ public class ImpulseFloor : MovementFloor {
         waitingTime = 0f;
         colliderTrigger = GetComponent<BoxCollider2D>();
         player = GameObject.Find("five");
-        saveInitialTransformation();
         impulseSpeedVector = calculateImpulseForceVector();       
         stop();
     }
@@ -31,11 +28,6 @@ public class ImpulseFloor : MovementFloor {
     override protected void onMovementFinished() {
         base.onMovementFinished();
         stop();
-    }
-
-    override protected void onFirstMovement() {
-        /*if (impulseForce > 0)
-            player.GetComponent<Rigidbody2D>().AddForce(impulseForceVector, ForceMode2D.Impulse);*/
     }
 
     void OnTriggerEnter2D(Collider2D col) {
@@ -56,17 +48,6 @@ public class ImpulseFloor : MovementFloor {
     private void stop() {
         enableMovement = false;
         colliderTrigger.enabled = true;
-    }
-
-    private void saveInitialTransformation() {
-        initialPos = transform.position;
-        initialRotation = transform.rotation;
-    }
-
-    public void reset() {
-        transform.position = initialPos;
-        transform.rotation = initialRotation;
-        deactivate();
     }
 
     private Vector2 calculateImpulseForceVector() {

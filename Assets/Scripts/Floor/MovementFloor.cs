@@ -21,6 +21,8 @@ public class MovementFloor : MonoBehaviour, IActivable {
     protected float waitingTimeCount = 0;
     protected AreaEffector2D effector;
     protected int movementsCount = 0;
+    protected Vector3 initialPos;
+    protected Quaternion initialRotation;
 
 
     void Start() {
@@ -32,6 +34,7 @@ public class MovementFloor : MonoBehaviour, IActivable {
         calculateDirection();
         effector = GetComponentInChildren<AreaEffector2D>();
         clock = new Clock(waitingTime);
+        saveInitialTransformation();
     }
 	
 	void Update () {
@@ -50,8 +53,6 @@ public class MovementFloor : MonoBehaviour, IActivable {
             switchDirection();
             stopForce();
             movementsCount++;
-            if (movementsCount == 1)
-                onFirstMovement();
             if(maxMovements > 0 && movementsCount >= maxMovements) {
                 onMovementFinished();
             }       
@@ -69,6 +70,12 @@ public class MovementFloor : MonoBehaviour, IActivable {
     protected void deactivate() {
         enableMovement = false;
         movementsCount = 0;
+    }
+
+    public void reset() {
+        transform.position = initialPos;
+        transform.rotation = initialRotation;
+        deactivate();
     }
 
     private bool platformArrived(Vector3 nextPos) {
@@ -107,6 +114,10 @@ public class MovementFloor : MonoBehaviour, IActivable {
         if (Mathf.Approximately(direction.y, 1f) == false &&
             Mathf.Approximately(direction.y, -1f) == false)
             direction.y = 0;
+
+        if ((direction.x != 0f && direction.y != 0) ||
+            (direction.x == 0f && direction.y == 0))
+            throw (new System.Exception(name + " tries diagonal movement"));
     }
 
     private void updateWaitingTime() {
@@ -123,8 +134,6 @@ public class MovementFloor : MonoBehaviour, IActivable {
         deactivate();
     }
 
-    protected virtual void onFirstMovement() { }
-
     /*
      * Control the ball on a platform, when its moving, is very difficult for the player.
      * When the platform moves add a fake force, with the direction of the movement,
@@ -140,6 +149,11 @@ public class MovementFloor : MonoBehaviour, IActivable {
     private void stopForce() {
         if (!effector) return;
         effector.forceMagnitude = 0f;
+    }
+
+    private void saveInitialTransformation() {
+        initialPos = transform.position;
+        initialRotation = transform.rotation;
     }
 }
 
