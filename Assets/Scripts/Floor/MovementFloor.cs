@@ -20,13 +20,11 @@ public class MovementFloor : MonoBehaviour, IActivable {
     protected bool waiting = false;
     protected float waitingTimeCount = 0;
     protected AreaEffector2D effector;
-    protected int movementsCount = 0;
-    protected Vector3 initialPos;
-    protected Quaternion initialRotation;
-
+    protected int movementsCount = 0;    
+    private InitialConfig initialConfig;
 
     void Start() {
-        init();
+        init(); 
     }
 
     protected void init() {
@@ -34,7 +32,7 @@ public class MovementFloor : MonoBehaviour, IActivable {
         calculateDirection();
         effector = GetComponentInChildren<AreaEffector2D>();
         clock = new Clock(waitingTime);
-        saveInitialTransformation();
+        initialConfig = saveInitialTransformation();
     }
 	
 	void Update () {
@@ -73,8 +71,11 @@ public class MovementFloor : MonoBehaviour, IActivable {
     }
 
     public void reset() {
-        transform.position = initialPos;
-        transform.rotation = initialRotation;
+        transform.position = startPos = initialConfig.initialPos;
+        transform.rotation = initialConfig.initialRotation;
+        finalPos = initialConfig.finalPos;
+        calculateDirection();
+        clock = new Clock(waitingTime);
         deactivate();
     }
 
@@ -115,9 +116,9 @@ public class MovementFloor : MonoBehaviour, IActivable {
             Mathf.Approximately(direction.y, -1f) == false)
             direction.y = 0;
 
-        if ((direction.x != 0f && direction.y != 0) ||
+       /* if ((direction.x != 0f && direction.y != 0) ||
             (direction.x == 0f && direction.y == 0))
-            throw (new System.Exception(name + " tries diagonal movement"));
+            throw (new System.Exception(name + " tries diagonal movement"));*/
     }
 
     private void updateWaitingTime() {
@@ -151,9 +152,18 @@ public class MovementFloor : MonoBehaviour, IActivable {
         effector.forceMagnitude = 0f;
     }
 
-    private void saveInitialTransformation() {
-        initialPos = transform.position;
-        initialRotation = transform.rotation;
+    private InitialConfig saveInitialTransformation() {
+        InitialConfig config = new InitialConfig();
+        config.initialPos = transform.position;
+        config.initialRotation = transform.rotation;
+        config.finalPos = finalPos;
+        return config;
     }
+}
+
+class InitialConfig {
+    public Vector3 initialPos;
+    public Quaternion initialRotation;
+    public Vector3 finalPos;
 }
 

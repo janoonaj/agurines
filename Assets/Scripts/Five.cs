@@ -65,7 +65,6 @@ public class Five : MonoBehaviour {
         Vector2 tempSpeed = GetComponent<Rigidbody2D>().velocity;
         if (speed.x != 0) tempSpeed.x = speed.x;
         if (speed.y != 0) tempSpeed.y = speed.y;
-        tempSpeed += speed;
         GetComponent<Rigidbody2D>().velocity = tempSpeed;
     }
 

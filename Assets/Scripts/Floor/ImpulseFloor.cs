@@ -31,12 +31,11 @@ public class ImpulseFloor : MovementFloor {
     }
 
     void OnTriggerEnter2D(Collider2D col) {
-        if(col.name == "five") {
-            move();
-            if (impulseSpeed > 0) {
-                player.GetComponent<Five>().applySpeed(impulseSpeedVector);
+        if (col.name != "five") return;
 
-            }
+        move();
+        if (impulseSpeed > 0) {
+            player.GetComponent<Five>().applySpeed(impulseSpeedVector);
         }
     }
 
