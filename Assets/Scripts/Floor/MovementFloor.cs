@@ -31,6 +31,7 @@ public class MovementFloor : MonoBehaviour, IActivable {
         startPos = transform.position;
         calculateDirection();
         effector = GetComponentInChildren<AreaEffector2D>();
+        startForce();
         clock = new Clock(waitingTime);
         initialConfig = saveInitialTransformation();
     }
@@ -116,9 +117,9 @@ public class MovementFloor : MonoBehaviour, IActivable {
             Mathf.Approximately(direction.y, -1f) == false)
             direction.y = 0;
 
-       /* if ((direction.x != 0f && direction.y != 0) ||
+        if ((direction.x != 0f && direction.y != 0) ||
             (direction.x == 0f && direction.y == 0))
-            throw (new System.Exception(name + " tries diagonal movement"));*/
+            throw (new System.Exception(name + " tries diagonal movement"));
     }
 
     private void updateWaitingTime() {
