@@ -10,7 +10,7 @@ public class Gravity : MonoBehaviour {
 
         float gravForce = 0f;
 
-        /*if (Application.platform == RuntimePlatform.WindowsEditor) {
+        if (Application.platform == RuntimePlatform.WindowsEditor) {
             float PC_GRAVITY = 0.4f;
             if (Input.GetKey(KeyCode.LeftArrow)) gravForce = -PC_GRAVITY;
             if (Input.GetKey(KeyCode.RightArrow)) gravForce = PC_GRAVITY;
@@ -21,11 +21,11 @@ public class Gravity : MonoBehaviour {
                     five.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 4f), ForceMode2D.Impulse);
                 }
             }
-        }*/
+        }
 
-       // if(Application.platform == RuntimePlatform.Android) {
+        if(Application.platform == RuntimePlatform.Android) {
             gravForce = Input.acceleration.x;
-       // }
+        }
         
         bool rotateLeft = false;
         if (gravForce < 0)

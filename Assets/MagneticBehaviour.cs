@@ -3,8 +3,10 @@ using System.Collections.Generic;
 
 public class MagneticBehaviour : MonoBehaviour {
     public Collider2D magneticCollider;
+    public Effector2D effectorGUI;
     public Side[] sides;
-    public MagneticType magneticForce;
+    private EffectorEmbed effector;
+    private MagneticType magneticType;
     private List<LinePainter> linePainters;
     private float lineWidthMax = 0.06f;
     private float lineWidthMin = 0.02f;
@@ -16,7 +18,15 @@ public class MagneticBehaviour : MonoBehaviour {
 
 
     void Start() {
+        effector = new EffectorEmbed(effectorGUI);
+        if(effector.forceMagnitude() > 0) {
+            magneticType = MagneticType.REPEL;
+        } else {
+            magneticType = MagneticType.ATTRACT;
+        }
+        
         linePainters = createLinePainters();
+
     }
 
     void Update() {
@@ -37,22 +47,22 @@ public class MagneticBehaviour : MonoBehaviour {
             if(side == Side.BOTTOM) {
                 linePainters.Add(new LinePainterBottom(gameObject.transform.position, spriteWidth,
                                                         spriteHeight, radious, 
-                                                        lineWidthMin, lineWidthMax, num_lines, SPEED));
+                                                        lineWidthMin, lineWidthMax, num_lines, SPEED, magneticType));
             } 
             else if (side == Side.TOP) {
                 linePainters.Add(new LinePainterTop(gameObject.transform.position, spriteWidth,
                                                         spriteHeight, radious,
-                                                        lineWidthMin, lineWidthMax, num_lines, SPEED));
+                                                        lineWidthMin, lineWidthMax, num_lines, SPEED, magneticType));
             }
             else if (side == Side.RIGHT) {
                 linePainters.Add(new LinePainterRight(gameObject.transform.position, spriteWidth,
                                                         spriteHeight, radious,
-                                                        lineWidthMin, lineWidthMax, num_lines, SPEED));
+                                                        lineWidthMin, lineWidthMax, num_lines, SPEED, magneticType));
             }
             else if (side == Side.LEFT) {
                 linePainters.Add(new LinePainterLeft(gameObject.transform.position, spriteWidth,
                                                         spriteHeight, radious,
-                                                        lineWidthMin, lineWidthMax, num_lines, SPEED));
+                                                        lineWidthMin, lineWidthMax, num_lines, SPEED, magneticType));
             }
         }
 
@@ -76,10 +86,11 @@ class LinePainterBottom : LinePainter {
     private float lineWidthMax;
     private int numLines;
     private float speed;
+    private MagneticBehaviour.MagneticType magneticType;
 
     public LinePainterBottom (Vector3 objectPosition, float spriteWidth, float spriteHeight, 
                             float radious, float lineWidthMin, float lineWidthMax, int numLines,
-                            float speed) {
+                            float speed, MagneticBehaviour.MagneticType magneticType) {
         this.spriteWidth = spriteWidth;
         this.spriteHeight = spriteHeight;
         this.objectPosition = objectPosition;
@@ -88,6 +99,7 @@ class LinePainterBottom : LinePainter {
         this.lineWidthMax = lineWidthMax;
         this.numLines = numLines;
         this.speed = speed;
+        this.magneticType = magneticType;
         border = new Vector3(objectPosition.x, objectPosition.y - spriteHeight / 2, 0);
         createLines();
     }
@@ -95,10 +107,19 @@ class LinePainterBottom : LinePainter {
     public void updateLines() {
         foreach (Line line in lines) {
             Vector3 newPos = line.getPos();
-            newPos.y -= Time.deltaTime * speed;
-            if (newPos.y <= border.y - distance) {
-                float overflow = newPos.y - (border.y - distance);
-                newPos.y = border.y + overflow;
+            if (magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                newPos.y -= Time.deltaTime * speed;
+                if (newPos.y <= border.y - distance) {
+                    float overflow = newPos.y - (border.y - distance);
+                    newPos.y = border.y + overflow;
+                }
+            }
+            else {
+                newPos.y += Time.deltaTime * speed;
+                if (newPos.y >= border.y) {
+                    float overflow = newPos.y - border.y;
+                    newPos.y = (border.y - distance) + overflow;
+                }
             }
             line.setPos(newPos);
             setLineWidth(line, newPos, border);
@@ -132,10 +153,11 @@ class LinePainterTop : LinePainter {
     private float lineWidthMax;
     private int numLines;
     private float speed;
+    private MagneticBehaviour.MagneticType magneticType;
 
     public LinePainterTop(Vector3 objectPosition, float spriteWidth, float spriteHeight,
                             float radious, float lineWidthMin, float lineWidthMax, int numLines,
-                            float speed) {
+                            float speed, MagneticBehaviour.MagneticType magneticType) {
         this.spriteWidth = spriteWidth;
         this.spriteHeight = spriteHeight;
         this.objectPosition = objectPosition;
@@ -144,6 +166,7 @@ class LinePainterTop : LinePainter {
         this.lineWidthMax = lineWidthMax;
         this.numLines = numLines;
         this.speed = speed;
+        this.magneticType = magneticType;
         border = new Vector3(objectPosition.x, objectPosition.y + spriteHeight / 2, 0);
         createLines();
     }
@@ -151,10 +174,19 @@ class LinePainterTop : LinePainter {
     public void updateLines() {
         foreach (Line line in lines) {
             Vector3 newPos = line.getPos();
-            newPos.y += Time.deltaTime * speed;
-            if (newPos.y >= border.y + distance) {
-                float overflow = newPos.y - (border.y + distance);
-                newPos.y = border.y + overflow;
+            if (magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                newPos.y += Time.deltaTime * speed;
+                if (newPos.y >= border.y + distance) {
+                    float overflow = newPos.y - (border.y + distance);
+                    newPos.y = border.y + overflow;
+                }
+            }
+            else {
+                newPos.y -= Time.deltaTime * speed;
+                if (newPos.y <= border.y) {
+                    float overflow = border.y - newPos.y;
+                    newPos.y = (border.y + distance) - overflow;
+                }
             }
             line.setPos(newPos);
             setLineWidth(line, newPos, border);
@@ -188,10 +220,11 @@ class LinePainterRight : LinePainter {
     private float lineWidthMax;
     private int numLines;
     private float speed;
+    private MagneticBehaviour.MagneticType magneticType;
 
     public LinePainterRight(Vector3 objectPosition, float spriteWidth, float spriteHeight,
                             float radious, float lineWidthMin, float lineWidthMax, int numLines,
-                            float speed) {
+                            float speed, MagneticBehaviour.MagneticType magneticType) {
         this.spriteWidth = spriteWidth;
         this.spriteHeight = spriteHeight;
         this.objectPosition = objectPosition;
@@ -200,6 +233,7 @@ class LinePainterRight : LinePainter {
         this.lineWidthMax = lineWidthMax;
         this.numLines = numLines;
         this.speed = speed;
+        this.magneticType = magneticType;
         border = new Vector3(objectPosition.x + spriteWidth / 2 , objectPosition.y, 0);
         createLines();
     }
@@ -207,10 +241,18 @@ class LinePainterRight : LinePainter {
     public void updateLines() {
         foreach (Line line in lines) {
             Vector3 newPos = line.getPos();
-            newPos.x += Time.deltaTime * speed;
-            if (newPos.x >= border.x + distance) {
-                float overflow = newPos.x - (border.x + distance);
-                newPos.x = border.x + overflow;
+            if (magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                newPos.x += Time.deltaTime * speed;
+                if (newPos.x >= border.x + distance) {
+                    float overflow = newPos.x - (border.x + distance);
+                    newPos.x = border.x + overflow;
+                }
+            } else {
+                newPos.x -= Time.deltaTime * speed;
+                if (newPos.x <= border.x) {
+                    float overflow = border.x - newPos.x;
+                    newPos.x = (border.x + distance) - overflow;
+                }
             }
             line.setPos(newPos);
             setLineWidth(line, newPos, border);
@@ -244,10 +286,11 @@ class LinePainterLeft : LinePainter {
     private float lineWidthMax;
     private int numLines;
     private float speed;
+    private MagneticBehaviour.MagneticType magneticType;
 
     public LinePainterLeft(Vector3 objectPosition, float spriteWidth, float spriteHeight,
                             float radious, float lineWidthMin, float lineWidthMax, int numLines,
-                            float speed) {
+                            float speed, MagneticBehaviour.MagneticType magneticType) {
         this.spriteWidth = spriteWidth;
         this.spriteHeight = spriteHeight;
         this.objectPosition = objectPosition;
@@ -256,6 +299,7 @@ class LinePainterLeft : LinePainter {
         this.lineWidthMax = lineWidthMax;
         this.numLines = numLines;
         this.speed = speed;
+        this.magneticType = magneticType;
         border = new Vector3(objectPosition.x - spriteWidth / 2, objectPosition.y, 0);
         createLines();
     }
@@ -263,10 +307,18 @@ class LinePainterLeft : LinePainter {
     public void updateLines() {
         foreach (Line line in lines) {
             Vector3 newPos = line.getPos();
-            newPos.x -= Time.deltaTime * speed;
-            if (newPos.x <= border.x - distance) {
-                float overflow = newPos.x - (border.x - distance);
-                newPos.x = border.x + overflow;
+            if (magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                newPos.x -= Time.deltaTime * speed;
+                if (newPos.x <= border.x - distance) {
+                    float overflow = newPos.x - (border.x - distance);
+                    newPos.x = border.x + overflow;
+                }
+            } else {
+                newPos.x += Time.deltaTime * speed;
+                if (newPos.x >= border.x) {
+                    float overflow = newPos.x - border.x;
+                    newPos.x = border.x - distance + overflow;
+                }
             }
             line.setPos(newPos);
             setLineWidth(line, newPos, border);
@@ -327,41 +379,19 @@ class Line {
     public Vector3 getPos() { return pos; }
 }
 
-/* private void addLineRenderer(GameObject line, float yOffset, float width) {
-     LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-     lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
-     lineRenderer.SetWidth(width, width);
-     float xPos = gameObject.transform.position.x;
-     float yPos = gameObject.transform.position.y - spriteHeight / 2 - yOffset;
-     Vector3 initPos = new Vector3(xPos - spriteWidth / 2, yPos, 0);
-     Vector3 finishPos = new Vector3(xPos + spriteWidth / 2, yPos, 0);
-     lineRenderer.SetPosition(0, initPos);
-     lineRenderer.SetPosition(1, finishPos);
- }*/
+class EffectorEmbed {
+    private Effector2D effector;
+    public EffectorEmbed(Effector2D effector) {
+        this.effector = effector;
+    }
 
-
-
-/*float sizeValue = (2.0f * Mathf.PI) / theta_scale;
-int size = (int)sizeValue;
-size++;
-lineRenderer = gameObject.AddComponent<LineRenderer>();
-lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
-lineRenderer.SetWidth(0.02f, 0.02f); //thickness of line
-Vector3 initPos = new Vector3(gameObject.transform.position.x - 1, gameObject.transform.position.y, 0);
-Vector3 finishos = new Vector3(gameObject.transform.position.x + 1, gameObject.transform.position.y, 0);
-
-
-
-lineRenderer.SetVertexCount(size);
-
-Vector3 pos;
-float theta = 0f;
-for (int i = 0; i < size; i++) {
-    theta += (2.0f * Mathf.PI * theta_scale);
-    float x = radius * Mathf.Cos(theta);
-    float y = radius * Mathf.Sin(theta);
-    x += gameObject.transform.position.x;
-    y += gameObject.transform.position.y;
-    pos = new Vector3(x, y, 0);
-    lineRenderer.SetPosition(i, pos);
-}*/
+    public float forceMagnitude() {
+        if (effector is PointEffector2D) {
+            return ((PointEffector2D)effector).forceMagnitude;
+        }
+        else if (effector is AreaEffector2D) {
+            return ((AreaEffector2D)effector).forceMagnitude;
+        }
+        throw (new System.Exception("Effector should be point or area. (MagneticBehaviour.cs)"));
+    }
+}
