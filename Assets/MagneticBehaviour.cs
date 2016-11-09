@@ -79,8 +79,6 @@ public class MagneticBehaviour : MonoBehaviour {
         else if (currentMagneticState() == MagneticType.NONE) {
             effector.setForceMagnitude(0f);
         }
-
-        effector.setForceMagnitude(0f);
     }
 
     private MagneticType currentMagneticState() {
