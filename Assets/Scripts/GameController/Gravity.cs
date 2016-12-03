@@ -5,6 +5,7 @@ using System;
 public class Gravity : MonoBehaviour {
     
     private const float MAX_X_GRAVITY = 6f;
+    public bool usingUnityRemote;
 
     void FixedUpdate() {
 
@@ -23,7 +24,7 @@ public class Gravity : MonoBehaviour {
             }
         }
 
-        if(Application.platform == RuntimePlatform.Android) {
+        if(Application.platform == RuntimePlatform.Android || usingUnityRemote) {
             gravForce = Input.acceleration.x;
         }
         
