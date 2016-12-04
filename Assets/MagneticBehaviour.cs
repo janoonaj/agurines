@@ -5,7 +5,7 @@ using System;
 public class MagneticBehaviour : MonoBehaviour {
     public float magneticDistance;
     public Effector2D effectorGUI;
-    public Side[] sides;
+    public Side side;
     public float[] times;
     public MagneticType[] magneticTypes;
     private int magneticStateIndex = 0;
@@ -18,7 +18,7 @@ public class MagneticBehaviour : MonoBehaviour {
 
     private const float SPEED = 1f;
 
-    public enum Side{ TOP, BOTTOM, RIGHT, LEFT}
+    public enum Side{ TOP, BOTTOM, RIGHT, LEFT, ALL}
     public enum MagneticType { ATTRACT, REPEL, NONE}
 
 
@@ -70,14 +70,10 @@ public class MagneticBehaviour : MonoBehaviour {
     }
 
     private void updateMagneticForce() {
-        if (currentMagneticState() == MagneticType.REPEL) {
-            effector.setForceMagnitude(effectorForce);
-        }
-        else if (currentMagneticState() == MagneticType.ATTRACT) {
-            effector.setForceMagnitude(-effectorForce);
-        }
-        else if (currentMagneticState() == MagneticType.NONE) {
-            effector.setForceMagnitude(0f);
+        if (currentMagneticState() == MagneticType.NONE) {
+            effector.setNoForce();
+        } else {
+            effector.setForceMagnitude(effectorForce, currentMagneticState(), side);
         }
     }
 
@@ -97,28 +93,51 @@ public class MagneticBehaviour : MonoBehaviour {
         int num_lines = (int)Mathf.Max(magneticDistance * 4f, 4f);
         float spriteWidth = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
         float spriteHeight = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
-        foreach (Side side in sides) {
-            if(side == Side.BOTTOM) {
-                linePainters.Add(new LinePainterBottom(gameObject.transform.position, spriteWidth,
-                                                        spriteHeight, magneticDistance, 
-                                                        lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
-            } 
-            else if (side == Side.TOP) {
-                linePainters.Add(new LinePainterTop(gameObject.transform.position, spriteWidth,
+
+        Action painterBottom = delegate () {
+            linePainters.Add(new LinePainterBottom(gameObject.transform.position, spriteWidth,
+                                                    spriteHeight, magneticDistance,
+                                                    lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
+        };
+
+        Action painterTop = delegate () {
+            linePainters.Add(new LinePainterTop(gameObject.transform.position, spriteWidth,
                                                         spriteHeight, magneticDistance,
                                                         lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
-            }
-            else if (side == Side.RIGHT) {
-                linePainters.Add(new LinePainterRight(gameObject.transform.position, spriteWidth,
+        };
+
+        Action painterRight = delegate () {
+            linePainters.Add(new LinePainterRight(gameObject.transform.position, spriteWidth,
                                                         spriteHeight, magneticDistance,
                                                         lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
-            }
-            else if (side == Side.LEFT) {
-                linePainters.Add(new LinePainterLeft(gameObject.transform.position, spriteWidth,
+        };
+
+        Action painterLeft = delegate () {
+            linePainters.Add(new LinePainterLeft(gameObject.transform.position, spriteWidth,
                                                         spriteHeight, magneticDistance,
                                                         lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
-            }
+        };
+
+        if (side == Side.BOTTOM) {
+            painterBottom();
         }
+        else if (side == Side.TOP) {
+            painterTop();
+        }
+        else if (side == Side.RIGHT) {
+            painterRight();
+
+        }
+        else if (side == Side.LEFT) {
+            painterLeft();
+        } else if(side == Side.ALL) {
+            painterBottom(); painterLeft(); painterRight(); painterTop();
+        }
+
+        if (currentMagneticState() == MagneticType.NONE) {
+            foreach (LinePainter linePainter in linePainters)
+                linePainter.hide();
+            }
 
         return linePainters;
     }
@@ -472,14 +491,48 @@ class EffectorEmbed {
         throw (new System.Exception("Effector should be point or area. (MagneticBehaviour.cs)"));
     }
 
-    public void setForceMagnitude(float force) {
+    public void setForceMagnitude(  float force, 
+                                    MagneticBehaviour.MagneticType magneticType,
+                                    MagneticBehaviour.Side side) {
         if (effector is PointEffector2D) {
-            ((PointEffector2D)effector).forceMagnitude = force;
+            if (magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                ((PointEffector2D)effector).forceMagnitude = force;
+            }
+            else if (magneticType == MagneticBehaviour.MagneticType.ATTRACT) {
+                ((PointEffector2D)effector).forceMagnitude = -force;
+            } 
         }
         else if (effector is AreaEffector2D) {
             ((AreaEffector2D)effector).forceMagnitude = force;
+            if(side == MagneticBehaviour.Side.BOTTOM && magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                ((AreaEffector2D)effector).forceAngle = 270;
+            } else if (side == MagneticBehaviour.Side.RIGHT && magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                ((AreaEffector2D)effector).forceAngle = 0;
+            } else if (side == MagneticBehaviour.Side.TOP && magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                ((AreaEffector2D)effector).forceAngle = 90;
+            } else if (side == MagneticBehaviour.Side.LEFT && magneticType == MagneticBehaviour.MagneticType.REPEL) {
+                ((AreaEffector2D)effector).forceAngle = 180;
+            } else if (side == MagneticBehaviour.Side.BOTTOM && magneticType == MagneticBehaviour.MagneticType.ATTRACT) {
+                ((AreaEffector2D)effector).forceAngle = 90;
+            } else if (side == MagneticBehaviour.Side.RIGHT && magneticType == MagneticBehaviour.MagneticType.ATTRACT) {
+                ((AreaEffector2D)effector).forceAngle = 180;
+            } else if (side == MagneticBehaviour.Side.TOP && magneticType == MagneticBehaviour.MagneticType.ATTRACT) {
+                ((AreaEffector2D)effector).forceAngle = 270;
+            } else if (side == MagneticBehaviour.Side.LEFT && magneticType == MagneticBehaviour.MagneticType.ATTRACT) {
+                ((AreaEffector2D)effector).forceAngle = 0;
+            }
+            else throw (new System.Exception("Area effector should have valid side and type (MagneticBehaviour.cs)"));
         }
         else
             throw (new System.Exception("Effector should be point or area. (MagneticBehaviour.cs)"));
+    }
+
+    public void setNoForce() {
+        if (effector is PointEffector2D) {
+            ((PointEffector2D)effector).forceMagnitude = 0;
+        }
+        else if (effector is AreaEffector2D) {
+            ((AreaEffector2D)effector).forceMagnitude = 0;
+        }
     }
 }
