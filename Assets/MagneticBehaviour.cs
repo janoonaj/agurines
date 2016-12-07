@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System;
 
 public class MagneticBehaviour : MonoBehaviour {
-    public float magneticDistance;
     public Effector2D effectorGUI;
     public Side side;
     public float[] times;
@@ -24,7 +23,7 @@ public class MagneticBehaviour : MonoBehaviour {
 
     void Start() {
         checkGUIData();
-        effector = new EffectorEmbed(effectorGUI);
+        effector = new EffectorEmbed(effectorGUI, side);
         effectorForce = Math.Abs(effector.getForceMagnitude());
         updateMagneticForce();
         linePainters = createLinePainters();
@@ -90,31 +89,31 @@ public class MagneticBehaviour : MonoBehaviour {
         List<LinePainter> linePainters = new List<LinePainter>();
         // num_lines Not 100% accurate, radious is not the magnetic distance (it's taking the center, 
         // but should start on the side of the floor. distance = radious - spriteHeight / 2)
-        int num_lines = (int)Mathf.Max(magneticDistance * 4f, 4f);
+        int num_lines = (int)Mathf.Max(effector.effectorDistance * 4f, 4f);
         float spriteWidth = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
         float spriteHeight = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
 
         Action painterBottom = delegate () {
             linePainters.Add(new LinePainterBottom(gameObject.transform.position, spriteWidth,
-                                                    spriteHeight, magneticDistance,
+                                                    spriteHeight, effector.effectorDistance,
                                                     lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
         };
 
         Action painterTop = delegate () {
             linePainters.Add(new LinePainterTop(gameObject.transform.position, spriteWidth,
-                                                        spriteHeight, magneticDistance,
+                                                        spriteHeight, effector.effectorDistance,
                                                         lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
         };
 
         Action painterRight = delegate () {
             linePainters.Add(new LinePainterRight(gameObject.transform.position, spriteWidth,
-                                                        spriteHeight, magneticDistance,
+                                                        spriteHeight, effector.effectorDistance,
                                                         lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
         };
 
         Action painterLeft = delegate () {
             linePainters.Add(new LinePainterLeft(gameObject.transform.position, spriteWidth,
-                                                        spriteHeight, magneticDistance,
+                                                        spriteHeight, effector.effectorDistance,
                                                         lineWidthMin, lineWidthMax, num_lines, SPEED, currentMagneticState()));
         };
 
@@ -476,9 +475,32 @@ class Line {
 
 class EffectorEmbed {
     private Effector2D effector;
+    private MagneticBehaviour.Side side;
+    public float effectorDistance { get; private set; }
 
-    public EffectorEmbed(Effector2D effector) {
+    public EffectorEmbed(Effector2D effector, MagneticBehaviour.Side side) {
+        this.side = side;
         this.effector = effector;
+        effectorDistance = calculateEffectorDistance();
+    }
+
+    private float calculateEffectorDistance() {
+        if (effector is PointEffector2D) {
+            return ((PointEffector2D)effector).GetComponent<CircleCollider2D>().radius;
+        }
+        else if (effector is AreaEffector2D) {
+            if(side == MagneticBehaviour.Side.BOTTOM || 
+                side == MagneticBehaviour.Side.TOP) {
+                return ((AreaEffector2D)effector).GetComponent<BoxCollider2D>().bounds.size.y;
+            }
+            else if (side == MagneticBehaviour.Side.RIGHT ||
+                side == MagneticBehaviour.Side.LEFT) {
+                return ((AreaEffector2D)effector).GetComponent<BoxCollider2D>().bounds.size.x;
+            } else
+                throw (new System.Exception("Effector box2D invalid side. (MagneticBehaviour.cs)"));
+        }
+
+        throw (new System.Exception("Effector distance couldn't be calculated. (MagneticBehaviour.cs)"));
     }
 
     public float getForceMagnitude() {
@@ -535,4 +557,6 @@ class EffectorEmbed {
             ((AreaEffector2D)effector).forceMagnitude = 0;
         }
     }
+
+    
 }
