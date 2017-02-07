@@ -9,7 +9,7 @@ public class rotate : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void LateUpdate () {
 		Vector3 euler = transform.localEulerAngles;
 		euler.z += 2f;
 		transform.localEulerAngles = euler;

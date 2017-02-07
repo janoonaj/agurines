@@ -1,4 +1,4 @@
-Shader "2D Dynamic Lights/Gradient/NoTex-AlphaBlend" {
+Shader "Gradient/No Texture/Radial/Single-Color/To Transparent/Regular UV/Alpha Blend" {
 
 	//Set up the shader to receive external inputs from Unity
 	Properties {
